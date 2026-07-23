@@ -108,25 +108,25 @@ export default defineComponent({
 
 function buildRows(data: Record<string, string[]>): PersonCell[][] {
   const dayLists = DAYS.map((d) => data[d] ?? [])
+  // 最大行数 = 所有天中 values 的最大长度
+  const maxRows = Math.max(...dayLists.map((l) => l.length), 0)
   const rows: PersonCell[][] = []
-  // 按星期一的顺序排序，确保表格行顺序与星期一一致
-  const monday = data[DAYS[0]] ?? []
-  const allNames = [...new Set([...monday, ...dayLists.flat()])]
 
-  for (const name of allNames) {
+  for (let r = 0; r < maxRows; r++) {
     const row: PersonCell[] = []
     let col = 0
     while (col < 7) {
       const namesToday = dayLists[col]
-      const idx = namesToday.indexOf(name)
-      if (idx === -1) {
+      const name = r < namesToday.length ? namesToday[r] : null
+      if (name === null) {
         col++
         continue
       }
+      // 向后找连续天数：同一人且同一 index
       let span = 1
       while (col + span < 7) {
         const nextNames = dayLists[col + span]
-        if (nextNames.indexOf(name) === idx) {
+        if (r < nextNames.length && nextNames[r] === name) {
           span++
         } else {
           break
@@ -135,7 +135,7 @@ function buildRows(data: Record<string, string[]>): PersonCell[][] {
       row.push({ name, colStart: col, colSpan: span })
       col += span
     }
-    if (row.length > 0) rows.push(row)
+    rows.push(row)
   }
   return rows
 }
