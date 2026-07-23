@@ -18,15 +18,10 @@
       <tbody>
         <tr v-for="(row, ri) in rows" :key="ri">
           <td class="index">{{ ri + 1 }}</td>
-          <td
-            v-for="col in 7"
-            :key="col"
-            v-show="isCellStart(row, col - 1)"
-            :colspan="cellSpan(row, col - 1)"
-            class="cell"
-          >
-            {{ cellName(row, col - 1) }}
-          </td>
+          <template v-for="(cell, ci) in row" :key="ci">
+            <td v-if="cell" :colspan="cell.colSpan" class="cell">{{ cell.name }}</td>
+            <td v-else class="cell empty"></td>
+          </template>
         </tr>
         <tr v-if="rows.length === 0">
           <td colspan="8" class="empty">暂无出差记录</td>
@@ -74,7 +69,7 @@ export default defineComponent({
         return null
       }
     },
-    rows(): PersonCell[][] {
+    rows(): (PersonCell | null)[][] {
       const data = this.parsedData
       if (!data) return []
       return buildRows(data)
