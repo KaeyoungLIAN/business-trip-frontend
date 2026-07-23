@@ -109,7 +109,9 @@ export default defineComponent({
 function buildRows(data: Record<string, string[]>): PersonCell[][] {
   const dayLists = DAYS.map((d) => data[d] ?? [])
   const rows: PersonCell[][] = []
-  const allNames = [...new Set(dayLists.flat())]
+  // 按星期一的顺序排序，确保表格行顺序与星期一一致
+  const monday = data[DAYS[0]] ?? []
+  const allNames = [...new Set([...monday, ...dayLists.flat()])]
 
   for (const name of allNames) {
     const row: PersonCell[] = []
