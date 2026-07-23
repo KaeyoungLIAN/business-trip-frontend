@@ -19,9 +19,12 @@
         <tr v-for="(row, ri) in rows" :key="ri">
           <td class="index">{{ ri + 1 }}</td>
           <template v-for="(cell, ci) in row" :key="ci">
-            <td v-if="cell" :colspan="cell.colSpan" class="cell">{{ cell.name }}</td>
-            <td v-else class="cell empty"></td>
+            <!-- 如果前面有空白天，补上空单元格 -->
+            <td v-for="gap in (ci === 0 ? cell.colStart : cell.colStart - row[ci - 1].colStart - row[ci - 1].colSpan)" :key="'gap-' + ci + '-' + gap" class="cell empty"></td>
+            <td :colspan="cell.colSpan" class="cell">{{ cell.name }}</td>
           </template>
+          <!-- 行末剩余空白 -->
+          <td v-for="gap in (7 - (row.length > 0 ? row[row.length - 1].colStart + row[row.length - 1].colSpan : 0))" :key="'endgap-' + gap" class="cell empty"></td>
         </tr>
         <tr v-if="rows.length === 0">
           <td colspan="8" class="empty">暂无出差记录</td>
